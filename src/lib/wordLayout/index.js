@@ -1,5 +1,12 @@
 /**
- * Adopted from https://github.com/timdream/wordcloud2.js
+ * Adopted from https://github.com/timdream/wordcloud2.js by Andrei Kashcha
+ *
+ * Major changes:
+ * - Rendering logic is removed from this module. This is in-memory algorithm.
+ *   It still uses canvas (detached from DOM) to perform packing.
+ *
+ * - Deterministic randomness. The algorithm use the seeded PRNG (ngraph.random)
+ *   Which allows to get consistent layouts between multiple reruns.
  *
  * Original worldcloud2.js license:
  *
