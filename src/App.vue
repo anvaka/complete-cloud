@@ -139,7 +139,7 @@ export default {
           shape,
           gridSize: 4,
           weightFactor: 1.42,
-          fontFamily: 'sans-serif',
+          fontFamily: 'Helvetica, sans-serif',
           maxRotation: Math.PI/2,
           minRotation: Math.PI/2
         });

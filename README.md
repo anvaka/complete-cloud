@@ -1,8 +1,9 @@
 # complete-cloud
 
-> autocompletion clouds
+A simple world cloud visualization that shows most common google's auto completion
+for questions about countries.
 
-## Build Setup
+## Local build
 
 ``` bash
 # install dependencies
@@ -15,4 +16,6 @@ npm run dev
 npm run build
 ```
 
-For more information see the [docs for vueify](https://github.com/vuejs/vueify).
+# License
+
+MIT
