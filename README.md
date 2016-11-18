@@ -33,15 +33,22 @@ Then each suggestion is recorded and stored into json format:
 ```
 
 **NOTE**: This extraction work is automated and managed by [anvaka/wpg-data](https://github.com/anvaka/wpg-data)
-repository. I'm trying to update this data on a daily basis.
+repository. I'm trying to update data on a daily basis.
 
-I extract all words between `<b></b>` tags and use [world cloud layout algorithm](https://github.com/anvaka/complete-cloud/blob/master/src/lib/wordLayout/index.js)
-to determine position of a word.
+All words between `<b></b>` tags are extracted. I use [world cloud layout algorithm](https://github.com/anvaka/complete-cloud/blob/master/src/lib/wordLayout/index.js)
+to determine position of a word on the page.
 
 Common words are excluded. You can find the list of excluded words [here](https://github.com/anvaka/complete-cloud/blob/04a296b9bfccfe5eb756c41ab2bff09af8a17bdd/src/model/appModel.js#L3-L8)
 
 Rendering is done entirely in SVG. You can pan and zoom the image to see it at
-infinite precision. The interaction is managed by [anvaka/panzoom](https://github.com/anvaka/panzoom)
+infinite precision:
+
+* Use `mouse wheel` or `pinch zoom` to zoom in/zoom out. You can also use keyboard keys `-`, `+`
+to do the same.
+* With `left mouse button` (or `one finger` on mobile diveces) you can drag the area. Keyboard
+arrows should also do the same.
+
+**NOTE**: The SVG interaction is managed by [anvaka/panzoom](https://github.com/anvaka/panzoom)
 module.
 
 # See also
