@@ -24,7 +24,7 @@
       </ul>
     </div>
     <div class='about'>
-      <a href='https://github.com/anvaka/complete-cloud'>About...</a>
+      <a href='https://github.com/anvaka/complete-cloud#complete-cloud'>About...</a>
     </div>
   </div>
 </template>
