@@ -7,9 +7,9 @@ for questions about countries.
 
 Click on any tag to see queries:
 
-![why does expanded](https://raw.githubusercontent.com/anvaka/complete-cloud/master/media/screenshot_why_does_love.png)
+![why does expanded](https://raw.githubusercontent.com/anvaka/complete-cloud/master/media/screenshot_why_does_love_details.png)
 
-** Note **: If you are on mobile - touch and hold the tag for two seconds to see completions.
+**Note**: If you are on mobile - touch and hold the tag for two seconds to see completions.
 
 # How it's made?
 
@@ -27,12 +27,12 @@ Then each suggestion is recorded and stored into json format:
     "why does albania<b> love america</b>",
     "why does albania<b> have a bad reputation</b>",
     "why does albania<b> hate serbia</b>",
-    // ...
+    "..."
   ]
 }
 ```
 
-** NOTE **: This extraction work is automated and managed by [anvaka/wpg-data](https://github.com/anvaka/wpg-data)
+**NOTE**: This extraction work is automated and managed by [anvaka/wpg-data](https://github.com/anvaka/wpg-data)
 repository. I'm trying to update this data on a daily basis.
 
 I extract all words between `<b></b>` tags and use [world cloud layout algorithm](https://github.com/anvaka/complete-cloud/blob/master/src/lib/wordLayout/index.js)
