@@ -14,7 +14,7 @@
     "d3-cloud": "^1.2.1",
     "ngraph.events": "0.0.4",
     "ngraph.random": "0.0.1",
-    "panzoom": "^2.3.2",
+    "panzoom": "^2.4.0",
     "simplesvg": "^0.1.1",
     "vue": "^2.0.1",
     "webfontloader": "^1.6.26"

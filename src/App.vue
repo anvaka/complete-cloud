@@ -47,15 +47,37 @@ export default {
   data () { return appModel },
   mounted() {
     var scene = this.$refs.scene;
-    var zoomer = panzoom(scene)
-    zoomer.moveBy((window.innerWidth - 800)/2, 0);
+    this.zoomer = panzoom(scene);
   },
+
   methods: {
     handleClick(e) {
       var text = getTextFromEvent(e);
-      if (text) appModel.showAllMatches(text);
+      if (text) {
+        this.autoScale = 0;
+        appModel.showAllMatches(text);
+      }
     },
+    adjustScale(scene) {
+      var sceneRect = scene.getBBox()
+      var zoomer = this.zoomer;
+
+      var width = scene.ownerSVGElement.clientWidth;
+      var height = scene.ownerSVGElement.clientHeight;
+
+      var scale = Math.min(width, height) / Math.max(sceneRect.width, sceneRect.height)
+
+      var x = (width - sceneRect.width * scale) / 2;
+      var y = (height - sceneRect.height * scale) / 2;
+
+      zoomer.zoomAbs(0, 0, 1)
+      zoomer.moveTo(-sceneRect.x, -sceneRect.y)
+      zoomer.zoomAbs(0, 0, scale)
+      zoomer.moveBy(x, y)
+    },
+
     handleTouchStart(e) {
+      this.autoScale = 0;
       if (e.touches > 1) {
         this.cancelDetails();
         return;
@@ -103,6 +125,8 @@ export default {
       scene.innerHTML = '';
       appModel.hideAllMatches();
       var item = appModel.getItem(value);
+      var self = this;
+      self.autoScale = 150;
 
       if (item) {
         if (this.cloud) {
@@ -120,6 +144,7 @@ export default {
           minRotation: Math.PI/2
         });
         this.cloud.on('wordclouddrawn', onDrawn);
+        this.cloud.on('wordcloudstop', () => this.autoScale = 0);
       }
 
       function onDrawn(drawn, item)  {
@@ -135,12 +160,16 @@ export default {
           fill: record.color,
           'font-size': record.fontSize + 'px',
           'font-family': record.fontFamily,
-        //  'dominant-baseline': 'central'
-        })
+        });
         text.text(word)
         scene.appendChild(text);
+        if (self.autoScale > 0) {
+          self.autoScale -= 1;
+          self.adjustScale(scene);
+        }
       }
     }
+
   },
   computed: {
     selectedText() {
@@ -150,6 +179,10 @@ export default {
       if (item) return item.words;
     }
   }
+}
+
+function dist(x, y) {
+  return Math.abs(x - y);
 }
 
 function getTextFromEvent(e) {
