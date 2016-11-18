@@ -10,7 +10,17 @@ const excludeList = new Set([
 const endpoint = 'https://anvaka.github.io/wpg-data/world/';
 const appModel = {
   questions: [],
-  selected: ''
+  suggestions: {
+    show: false,
+    list: [],
+    title: ''
+  },
+
+  selected: '',
+
+  showAllMatches,
+  hideAllMatches,
+  getItem
 };
 
 var fontsReady = true;
@@ -46,15 +56,28 @@ function activateModelIfNeeded() {
 }
 
 function setOnModel(response) {
-  queriesResponse = response;
+  queriesResponse = convertToText(response);
   activateModelIfNeeded();
+}
+
+function convertToText(response) {
+  Object.keys(response).forEach(key => {
+    response[key].records.forEach(r => {
+      r.suggestions.forEach((suggestion, i) => {
+        r.suggestions[i] = suggestion.replace('&#39;', '\'');
+      })
+    })
+  })
+
+  return response;
 }
 
 function toUIModel(query, key) {
   return {
     key,
     display: query.display,
-    words: collectWords(query.records)
+    words: collectWords(query.records),
+    records: query.records
   }
 }
 
@@ -85,9 +108,33 @@ function collectWords(records) {
   function addWord(word) {
     if (excludeList.has(word)) return;
 
-    word = word.replace('&#39;', '\'');
     var counts = (count.get(word) || 0) + 1;
     if (counts > maxCount) maxCount = counts;
     count.set(word, counts)
   }
+}
+
+function hideAllMatches() {
+  appModel.suggestions.show = false;
+}
+
+function showAllMatches(text) {
+  var item = appModel.getItem(appModel.selected);
+  if (!item) throw new Error('How can this be? Item should be selected');
+
+  var list = []
+  var textMatch = new RegExp('\\b' + text + '\\b');
+  item.records.forEach(r => r.suggestions.forEach(suggestion => {
+    if (textMatch.test(suggestion)) {
+      list.push(suggestion);
+    }
+  }))
+
+  appModel.suggestions.title = text;
+  appModel.suggestions.show = list.length > 0;
+  appModel.suggestions.list = list;
+}
+
+function getItem(key) {
+  return appModel.questions.find(x => x.key === key);
 }

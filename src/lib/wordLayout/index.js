@@ -403,15 +403,33 @@ function wordLayout(list, options) {
       // when putWordAtPoint() returns true.
       // If all the points returns false, array.some() returns false.
       var transform;
-      for (var i = 0; i < points.length; ++i) {
-        transform = tryToPutWordAtPoint(points[i]);
-        if (transform){
-          return transform;
-        }
-      }
+      forEachInRandomOrder(points, point => {
+        transform = tryToPutWordAtPoint(point);
+        // quit early if can
+        if (transform) return true;
+      })
+
+      if (transform) return transform;
     }
     // we tried all distances but text won't fit, return false
     return false;
+
+    function forEachInRandomOrder(array, callback) {
+      var i, j, t;
+      for (i = array.length - 1; i > 0; --i) {
+        j = settings.random.next(i + 1); // i inclusive
+        t = array[j];
+        array[j] = array[i];
+        array[i] = t;
+
+        var stop = callback(t);
+        if (stop) return;
+      }
+
+      if (array.length) {
+          callback(array[0]);
+      }
+    }
 
     function tryToPutWordAtPoint(gxy) {
       var gx = Math.floor(gxy[0] - info.gw / 2);

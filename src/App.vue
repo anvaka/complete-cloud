@@ -7,10 +7,24 @@
       </select>
     </div>
     <div class='content'>
-      <svg viewbox='0 0 800 800'>
+      <svg viewbox='0 0 800 800' @click='handleClick' @touchstart='handleTouchStart' @touchend='handleTouchEnd' @touchmove='handleTouchEnd'>
           <g ref='scene'> 
           </g>
       </svg>
+    </div>
+    <div class='suggestions' v-if='suggestions.show'>
+      <div class='header'>
+        <h3>{{suggestions.title}}</h3>
+        <a href='#' @click='closeSuggesitons' class='close'>x</a>
+      </div>
+      <ul>
+        <li v-for='s in suggestions.list'>
+          <a :href='getLink(s)' target='_blank' v-html='s' :title='getText(s)'><a>
+        </li>
+      </ul>
+    </div>
+    <div class='about'>
+      <a href='https://github.com/anvaka/complete-cloud'>About...</a>
     </div>
   </div>
 </template>
@@ -21,6 +35,13 @@ import panzoom from 'panzoom';
 import svg from 'simplesvg';
 import wordCloud from './lib/wordLayout/index.js';
 
+var shapes = ['circle', 'cardioid', 'square',  'star', 'triangle-forward', 'triangle', 'pentagon'];
+var colorThemes = [
+  ['#657537', '#B5AE4B', '#305254'],
+  ['#950725', '#1F0202', '#BD6E00', '#BD7900', '#BD2F00'],
+  ['#120B26', '#682C21', '#955612']
+]
+
 export default {
   name: 'app',
   data () { return appModel },
@@ -29,21 +50,74 @@ export default {
     var zoomer = panzoom(scene)
     zoomer.moveBy((window.innerWidth - 800)/2, 0);
   },
+  methods: {
+    handleClick(e) {
+      var text = getTextFromEvent(e);
+      if (text) appModel.showAllMatches(text);
+    },
+    handleTouchStart(e) {
+      if (e.touches > 1) {
+        this.cancelDetails();
+        return;
+      }
+
+      var text = getTextFromEvent(e);
+      if (!text) {
+        this.cancelDetails();
+        return;
+      }
+
+      if (this.scheduledDetails) {
+        this.cancelDetails();
+      }
+
+      this.scheduledDetails = setTimeout(() => {
+        appModel.showAllMatches(text);
+      }, 1500)
+    },
+
+    handleTouchEnd(e) {
+      this.cancelDetails()
+    },
+
+    cancelDetails() {
+      if (this.scheduledDetails) {
+        clearTimeout(this.scheduledDetails);
+        this.scheduledDetails = null;
+      }
+    },
+
+    closeSuggesitons() {
+        appModel.hideAllMatches();
+    },
+    getLink(s) {
+      return 'https://www.google.com/#q=' + encodeURIComponent(this.getText(s));
+    },
+    getText(s) {
+      return s.replace(/<\/?b>/g, '');
+    }
+  },
   watch: {
     selected(value) {
       var scene = this.$refs.scene;
       scene.innerHTML = '';
-      var item = this.questions.find(x => x.key === value);
+      appModel.hideAllMatches();
+      var item = appModel.getItem(value);
+
       if (item) {
-        console.log('selected')
         if (this.cloud) {
           this.cloud.dispose()
           this.cloud = null;
         }
+        var shape = getShapeByItem(item);
+
         this.cloud = wordCloud(item.words, {
+          shape,
           gridSize: 4,
           weightFactor: 1.42,
-          fontFamily: 'sans-serif'
+          fontFamily: 'sans-serif',
+          maxRotation: Math.PI/2,
+          minRotation: Math.PI/2
         });
         this.cloud.on('wordclouddrawn', onDrawn);
       }
@@ -78,6 +152,24 @@ export default {
   }
 }
 
+function getTextFromEvent(e) {
+  if (e.target && e.target.tagName === 'text') return e.target.text();
+}
+
+function getShapeByItem(item) {
+  return shapes[item.words.length % shapes.length];
+}
+
+function getColorFunction(item) {
+  var themeIndex = item.words.length % colorThemes.length;
+  var theme = colorThemes[themeIndex]
+
+  return function(word, weight, fontSize, distance, theta) {
+    var idx = word.length % theme.length;
+    return theme[idx]
+  }
+}
+
 </script>
 
 <style scoped>
@@ -99,6 +191,55 @@ canvas {
 
 svg:focus {
   outline: none;
+}
+
+.close {
+  position: absolute;
+  right: 13px;
+  top: 9px;
+  text-decoration: none;
+}
+
+.suggestions {
+  position: absolute;
+  left: 0;
+  top: 0px;
+  bottom: 0;
+  width: 300px;
+  overflow: hidden;
+  background: white;
+  text-align: left;
+  flex-direction: column;
+  display: flex;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.suggestions h3 {
+  margin: 8px 10px;
+  font-family: sans-serif;
+  font-weight: normal;
+}
+.suggestions ul {
+  padding: 10px;
+  overflow-y: auto;
+  flex: 1;
+  margin: 0;
+border-top: 1px solid #aaa;
+}
+
+.suggestions ul li {
+  width: 100%;
+  overflow: hidden;
+}
+
+.suggestions ul li a {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 24px;
+  text-decoration: none;
+  overflow: hidden;
+  display: inline-block;
+  width: 100%;
 }
 
 
@@ -124,12 +265,15 @@ ul {
   padding: 0;
 }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
 a {
   color: #42b983;
+  text-decoration: none;
+}
+.about {
+  position: absolute;
+  right: 8px;
+  bottom: 0px;
+  background: rgba(245, 245, 245, 0.4)
 }
 </style>
+
