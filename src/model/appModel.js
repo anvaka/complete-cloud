@@ -1,4 +1,7 @@
 import request from '../lib/request.js';
+
+const queryState = require('query-state');
+
 //import WebFont from 'webfontloader';
 
 const excludeList = new Set([
@@ -6,6 +9,7 @@ const excludeList = new Set([
   'or',
   'it', 'its', 'is', 'by', 'was', 'be', 'are', 'you', 'your', 'had', 'i', 'have'
 ]);
+
 
 const endpoint = 'https://anvaka.github.io/wpg-data/world/';
 const appModel = {
@@ -51,9 +55,24 @@ function last(array) {
 function activateModelIfNeeded() {
   if (fontsReady && queriesResponse) {
     appModel.questions = Object.keys(queriesResponse).map(key => toUIModel(queriesResponse[key], key))
-    appModel.selected = appModel.questions[0].key;
+    appModel.selected = findSelected(queryState.instance().get().selected);
   }
 }
+
+function findSelected(selected) {
+  for (var i = 0; i < appModel.questions.length; ++i) {
+    var q = appModel.questions[i];
+    if (q.key === selected) {
+      return q.key;
+    }
+  }
+
+  var defaultKey = appModel.questions[0].key;
+  qs.set('selected', defaultKey);
+
+  return defaultKey;
+}
+
 
 function setOnModel(response) {
   queriesResponse = convertToText(response);

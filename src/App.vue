@@ -35,6 +35,8 @@ import panzoom from 'panzoom';
 import svg from 'simplesvg';
 import wordCloud from './lib/wordLayout/index.js';
 
+var queryState = require('query-state');
+
 var shapes = ['circle', 'cardioid', 'square',  'star', 'triangle-forward', 'triangle', 'pentagon'];
 var colorThemes = [
   ['#657537', '#B5AE4B', '#305254'],
@@ -121,6 +123,7 @@ export default {
   },
   watch: {
     selected(value) {
+      queryState.instance().set('selected', value);
       var scene = this.$refs.scene;
       scene.innerHTML = '';
       appModel.hideAllMatches();
