@@ -55,7 +55,13 @@ function last(array) {
 function activateModelIfNeeded() {
   if (fontsReady && queriesResponse) {
     appModel.questions = Object.keys(queriesResponse).map(key => toUIModel(queriesResponse[key], key))
-    appModel.selected = findSelected(queryState.instance().get().selected);
+
+    var qs = queryState.instance();
+    var selected = qs.get('selected');
+    appModel.selected = findSelected(selected);
+    if (selected !== appModel.selected) {
+      qs.set('selected', appModel.selected);
+    }
   }
 }
 
@@ -67,10 +73,7 @@ function findSelected(selected) {
     }
   }
 
-  var defaultKey = appModel.questions[0].key;
-  qs.set('selected', defaultKey);
-
-  return defaultKey;
+  return appModel.questions[0].key;
 }
 
 
