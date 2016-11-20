@@ -15,7 +15,7 @@
     "ngraph.events": "0.0.4",
     "ngraph.random": "0.0.1",
     "panzoom": "^2.4.0",
-    "query-state": "^2.0.0",
+    "query-state": "^3.0.0",
     "simplesvg": "^0.1.1",
     "vue": "^2.0.1",
     "webfontloader": "^1.6.26"
